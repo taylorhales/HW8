@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   Taylor Hales / COMP 400C - 001
  *
  *   Note, additional comments provided throughout this source code
  *   is for educational purposes
@@ -103,8 +103,29 @@ public class Graph {
    */
   
   public int findRoot() {
+    // initialize the in-degrees array
+    int[] inDegrees = new int[numVertices];
 
-    // ADD YOUR CODE HERE - DO NOT FORGET TO ADD YOUR NAME/SECTION AT TOP OF FILE
-    return -1;
+    // iterate through the adjacency list to count incoming edges of every vertex
+    for (int i = 0; i < numVertices; i++){
+      // for each vertex i, get the neighbors from adjacency list
+      for (int neighbor : adjListArr[i]){
+        inDegrees[neighbor]++;
+      }
+    }
+    // indicate no root found yet
+    int rootIndex = -1;
+    // traverse in-degree array to find vertices with no incoming edges
+    for (int i = 0; i < numVertices; i++){
+      // see if current vertex has an in-degree of 0
+      if (inDegrees[i] == 0){
+        if (rootIndex != -1){  // if root already found, there is more than 1 root
+          return -1;  // so return -1 since the graph doesn't have a unique root
+        }
+        rootIndex = i;  // otherwise, store the index of the root vertex
+      }
+    }
+    // return the value of the root vertex
+    return (rootIndex == -1) ? -1 : vertexValues.get(rootIndex);
   } 
 }

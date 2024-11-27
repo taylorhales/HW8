@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   ADD YOUR NAME / SECTION NUMBER HERE
+ *   Taylor Hales / COMP 400C - 001
  *
  *   This java file contains the problem solutions of canFinish and
  *   numGroups methods.
@@ -72,18 +72,61 @@ class ProblemSolutions {
      * @return boolean          - True if all exams can be taken, else false.
      */
 
-    public boolean canFinish(int numExams, 
-                             int[][] prerequisites) {
-      
+    public boolean canFinish(int numExams, int[][] prerequisites) {
+
         int numNodes = numExams;  // # of nodes in graph
 
         // Build directed graph's adjacency list
-        ArrayList<Integer>[] adj = getAdjList(numExams, 
-                                        prerequisites); 
+        ArrayList<Integer>[] adj = getAdjList(numExams,
+                prerequisites);
 
-        // ADD YOUR CODE HERE - ADD YOUR NAME / SECTION AT TOP OF FILE
+        // visited array to track the state of each node
+        int[] visited = new int[numExams];
+
+        // iterate through all nodes in the graph
+        for (int i = 0; i < numExams; i++){
+            // if a cycle is detected starting from node i, return false
+            if (hasCycle(i, adj, visited)){
+                return false;  // not able to complete all exams due to a cycle
+            }
+        }
+
+        // if no cycles are detected, return true (aka all exams can be completed)
+        return true;
+    }
+
+    /**
+     * Helper method to check for cycles using Depth-First Search (DFS).
+     * @param node - the current node being visited
+     * @param adj - the adjacency list representing the graph
+     * @param visited - array to track the state of each node
+     * @return true if a cycle is detected, otherwise false
+     */
+    private boolean hasCycle(int node, ArrayList<Integer>[] adj, int[] visited){
+        // if the node is already in recursion stack, a cycle is detected
+        if (visited[node] == 1){
+            return true;
+        }
+        // if node is fully visited, no cycle exists from it
+        if (visited[node] == 2){
+            return false;
+        }
+        // mark current node as visiting (add it to recursion stack
+        visited[node] = 1;
+
+        // traverse all adjacent nodes of current node
+        for (int neighbor : adj[node]){
+            // recursively check for cycles in neighboring nodes
+            if (hasCycle(neighbor, adj, visited)){
+                return true;  // cycle is detected in graph
+            }
+        }
+
+        // mark current node as fully visited, remove it from recursion stack
+        visited[node] = 2;
+
+        // no cycle detected for this node & its descendants
         return false;
-
     }
 
 
@@ -166,7 +209,10 @@ class ProblemSolutions {
     public int numGroups(int[][] adjMatrix) {
         int numNodes = adjMatrix.length;
         Map<Integer,List<Integer>> graph = new HashMap();
+        boolean[] visited = new boolean[numNodes]; // create an array to track if a node has been visited
+        int groupCount = 0;  // counter to keep track of number of connected groups
         int i = 0, j =0;
+
 
         /*
          * Converting the Graph Adjacency Matrix to
@@ -190,9 +236,35 @@ class ProblemSolutions {
             }
         }
 
-        // YOUR CODE GOES HERE - you can add helper methods, you do not need
-        // to put all code in this method.
-        return -1;
+        // traverse the graph using the depth-first search (DFS) to count
+        // the number of connected groups
+        for (int node = 0; node < numNodes; node++){
+            if (!visited[node]){  // if the current node has not been visited
+                groupCount++;  // increment as a new traversal is started
+                dfs(node, graph, visited);  // perform a DFS to mark all nodes in this group as visited
+            }
+        }
+        return groupCount;  // return total number of connected groups
+    }
+
+    /**
+     * Helper method to perform DFS on the graph.
+     * @param node - current node to explore
+     * @param graph - adjacency list representation of the graph
+     * @param visited - boolean array to track visited nodes
+     */
+
+    private void dfs(int node, Map<Integer, List<Integer>> graph, boolean[] visited){
+        visited[node] = true;  // mark the current node as visited
+
+        // explore all neighbors of the current node
+        if (graph.containsKey(node)){  // make sure the current node exists in adjacency list
+            for (int neighbor : graph.get(node)){  // iterate over all neighbors of the current node
+                if (!visited[neighbor]){
+                    dfs(neighbor, graph, visited);  // recursively visit the neighbor
+                }
+            }
+        }
     }
 
 }
